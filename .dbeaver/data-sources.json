@@ -1,0 +1,74 @@
+{
+	"folders": {},
+	"connections": {
+		"oracle_thin-17e5a0a0a9e-318c0c5fe2953e92": {
+			"provider": "oracle",
+			"driver": "oracle_thin",
+			"name": "ORCLCDB.localdomain",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "localhost",
+				"port": "1521",
+				"database": "ORCLCDB.localdomain",
+				"url": "jdbc:oracle:thin:@//localhost:1521/ORCLCDB.localdomain",
+				"type": "dev",
+				"provider-properties": {
+					"show-only-one-schema@": "false",
+					"@dbeaver-check-schema-content@": "false",
+					"@dbeaver-always-show-dba@": "false",
+					"@dbeaver-always-use-dba-views@": "false",
+					"@dbeaver-meta-use-sys-schema@": "false",
+					"@dbeaver-meta-use-simple-constraints@": "false",
+					"@dbeaver-use-rule-hint@": "false",
+					"@dbeaver-use-meta-optimizer@": "false",
+					"@dbeaver-meta-use-alternative-table-query@": "false",
+					"oracle.meta-search-in-synonyms": "false",
+					"@dbeaver-connection-type@": "BASIC",
+					"@dbeaver-sid-service@": "SERVICE"
+				},
+				"auth-model": "oracle_native"
+			}
+		},
+		"mysql8-17e81cbb089-7ece434d7fadc0b0": {
+			"provider": "mysql",
+			"driver": "mysql8",
+			"name": "db_exampleName",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "localhost",
+				"port": "3306",
+				"database": "db_exampleName",
+				"url": "jdbc:mysql://localhost:3306/db_exampleName",
+				"home": "mysql_client",
+				"type": "dev",
+				"auth-model": "native",
+				"handlers": {
+					"mysql_ssl": {
+						"type": "CONFIG",
+						"enabled": true,
+						"save-password": true,
+						"properties": {
+							"ssl.public.key.retrieve": "true",
+							"ssl.verify.server": "false",
+							"ssl.method": "CERTIFICATES",
+							"ssl.require": "false"
+						}
+					}
+				}
+			}
+		}
+	},
+	"connection-types": {
+		"dev": {
+			"name": "Development",
+			"color": "255,255,255",
+			"description": "Regular development database",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": false,
+			"auto-close-transactions": false
+		}
+	}
+}
