@@ -132,100 +132,183 @@ insert into alumno_asignatura values('A131313','160002','4');
 SELECT * FROM ASIGNATURA;
 
 --1. Cuantos costes básicos hay.
-SELECT COUNT(costebasico) FROM ASIGNATURA;   
+SELECT COUNT(costebasico) 
+FROM ASIGNATURA;   
 	   
 --2. Para cada titulación mostrar el número de asignaturas que hay junto con el nombre de la titulación.
-
+SELECT t.nombre, COUNT(a.idasignatura)
+FROM titulacion t, asignatura a
+WHERE t.idtitulacion = a.idtitulacion 
+GROUP BY t.nombre;
 
 --3. Para cada titulación mostrar el nombre de la titulación junto con el precio total de todas sus asignaturas.
+SELECT t.nombre, SUM(a.costebasico)
+FROM titulacion t, asignatura a
+WHERE t.idtitulacion = a.idtitulacion 
+GROUP BY t.nombre;
 
-
---4. Cual sería el coste global de cursar la titulación de Matemáticas si el coste de cada asignatura fuera incrementado en un 7%. 
-SELECT asignatura.costebasico*0.07 AS coste + 7%, asignatura.idtitulacion, titulacion.idtitulacion, titulacion.nombre 
-FROM asignatura, titulacion 
-WHERE asignatura.idtitulacion = titulacion.idtitulacion
-AND titulacion.nombre LIKE 'Matem%';                                  --ESTÁ MAL
+--4. Cual sería el coste global de cursar la titulación de Matemáticas si el 
+--coste de cada asignatura fuera incrementado en un 7%. 
+SELECT DISTINCT t.nombre, (a.costebasico * 1.07) AS "Coste + 7%" 
+FROM asignatura a, titulacion t
+WHERE a.idtitulacion = t.idtitulacion
+AND t.nombre LIKE 'Matematicas';                                  
 
 --5. Cuantos alumnos hay matriculados en cada asignatura, junto al id de la asignatura. 
-
+SELECT a.idasignatura, COUNT(aa.idalumno)
+FROM asignatura a, alumno_asignatura aa 
+WHERE a.idasignatura = aa.idasignatura 
+GROUP BY a.idasignatura;
 
 --6. Igual que el anterior pero mostrando el nombre de la asignatura.
+SELECT a.nombre, COUNT(aa.idalumno)
+FROM asignatura a, alumno_asignatura aa 
+WHERE a.idasignatura = aa.idasignatura 
+GROUP BY a.nombre;
 
+--7. Mostrar para cada alumno, el nombre del alumno junto con lo que tendría que pagar
+--por el total de todas las asignaturas en las que está matriculado. Recuerda que 
+--el precio de la matrícula tiene un incremento de un 10% por cada año en el que esté matriculado. 
+SELECT p.nombre || ' ' || p.apellido AS "Nombre de alumno", 
+	   SUM((a2.costebasico * (1.00 + (10 * aa.numeromatricula)))) AS "Precio de matricula"
+FROM persona p, alumno a, alumno_asignatura aa, asignatura a2
+WHERE p.dni = a.dni 
+AND a.idalumno = aa.idalumno 
+AND aa.idasignatura = a2.idasignatura
+GROUP BY p.nombre, p.apellido;
 
---7. Mostrar para cada alumno, el nombre del alumno junto con lo que tendría que pagar por el total de todas las asignaturas en las que está matriculada. Recuerda que el precio de la matrícula tiene un incremento de un 10% por cada año en el que esté matriculado. 
+--8. Coste medio de las asignaturas de cada titulación, para aquellas titulaciones en el que el 
+--coste total de la 1ª matrícula sea mayor que 60 euros. 
+SELECT t.nombre, AVG(a.costebasico)
+FROM asignatura a, titulacion t
+WHERE a.idtitulacion = t.idtitulacion
+HAVING SUM(a.costebasico * 1.10) > 60
+GROUP BY t.nombre; 
 
-
---8. Coste medio de las asignaturas de cada titulación, para aquellas titulaciones en el que el coste total de la 1ª matrícula sea mayor que 60 euros. 
-
-
---9. Nombre de las titulaciones  que tengan más de tres alumnos.
-
+--9. Nombre de las titulaciones que tengan más de tres alumnos.
+SELECT t.nombre 
+FROM titulacion t, asignatura a, alumno_asignatura aa 
+WHERE t.idtitulacion = a.idtitulacion 
+AND a.idasignatura = aa.idasignatura 
+HAVING COUNT(aa.idalumno) > 3
+GROUP BY t.nombre;
 
 --10. Nombre de cada ciudad junto con el número de personas que viven en ella.
-
+SELECT ciudad, COUNT(*)
+FROM persona 
+GROUP BY ciudad;
 
 --11. Nombre de cada profesor junto con el número de asignaturas que imparte.
-
+SELECT p.nombre || ' ' || p.apellido AS "Nombre de profesor", COUNT(a.idasignatura)
+FROM persona p, profesor p2, asignatura a 
+WHERE p.dni = p2.dni 
+AND p2.idprofesor = a.idprofesor
+GROUP BY p.nombre, p.apellido;
 
 --12. Nombre de cada profesor junto con el número de alumnos que tiene, para aquellos profesores que tengan dos o más de 2 alumnos.
-
+SELECT p.nombre || ' ' || p.apellido AS "Nombre de profesor", COUNT(aa.idalumno)
+FROM persona p, profesor p2, asignatura a, alumno_asignatura aa 
+WHERE p.dni = p2.dni 
+AND p2.idprofesor = a.idprofesor
+AND a.idasignatura = aa.idasignatura
+HAVING COUNT(aa.idalumno) >= 2
+GROUP BY p.nombre, p.apellido;
 
 --13. Obtener el máximo de las sumas de los costesbásicos de cada cuatrimestre
-SELECT SUM(MAX(costebasico)) FROM ASIGNATURA GROUP BY cuatrimestre;
+SELECT p.*	
+FROM (SELECT cuatrimestre, SUM(costebasico)
+	 FROM asignatura 
+	 GROUP BY cuatrimestre) p
+WHERE ROWNUM = 1;
 
 --14. Suma del coste de las asignaturas
-SELECT SUM (costebasico) FROM ASIGNATURA;
+SELECT SUM(costebasico) 
+FROM ASIGNATURA;
 
 --15. ¿Cuántas asignaturas hay?
-SELECT COUNT(idasignatura) FROM ASIGNATURA;
+SELECT COUNT(idasignatura) 
+FROM ASIGNATURA;
 
 --16. Coste de la asignatura más cara y de la más barata
-SELECT MAX(costebasico), MIN(costebasico) FROM asignatura;
+SELECT MAX(costebasico), MIN(costebasico) 
+FROM asignatura;
 
 --17. ¿Cuántas posibilidades de créditos de asignatura hay?
-SELECT COUNT(creditos) FROM asignatura;
+SELECT nombre, COUNT(creditos) 
+FROM asignatura
+GROUP BY nombre;	
+
+SELECT nombre, creditos 
+FROM asignatura;				--¿?
 
 --18. ¿Cuántos cursos hay?
-SELECT COUNT(curso) FROM asignatura;
+SELECT COUNT(curso) 
+FROM asignatura;
 
 --19. ¿Cuántas ciudades hay?
-SELECT COUNT(ciudad) FROM persona;
+SELECT COUNT(ciudad) 
+FROM persona;
 
 --20. Nombre y número de horas de todas las asignaturas.
-SELECT nombre, creditos*10 AS horas FROM asignatura;
+SELECT nombre, (creditos * 10) AS "Horas" 
+FROM asignatura;
 
 --21. Mostrar las asignaturas que no pertenecen a ninguna titulación.
-SELECT * FROM asignatura WHERE idtitulacion IS NULL;
+SELECT a.nombre 
+FROM asignatura a, titulacion t 
+WHERE a.idtitulacion = t.idtitulacion(+) 
+AND t.idtitulacion IS NULL;
 
 --22. Listado del nombre completo de las personas, sus teléfonos y sus direcciones, 
 --llamando a la columna del nombre "NombreCompleto" y a la de direcciones "Direccion".
-
+SELECT nombre || ' ' || apellido AS "Nombre completo", 
+	   telefono AS "Telefono",
+	   direccioncalle || ', ' || direccionnum AS "Direccion"
+FROM persona;
 
 --23. Cual es el día siguiente al día en que nacieron las personas de la B.D.
-
+SELECT (fecha_nacimiento + 1)
+FROM persona;
 
 --24. Años de las personas de la Base de Datos, esta consulta tiene que valor para cualquier momento.
-
+SELECT EXTRACT(YEAR FROM sysdate) - EXTRACT(YEAR FROM fecha_nacimiento)
+FROM persona;			--No es exacto, pero es una aproximacion.
 
 --25. Listado de personas mayores de 25 años ordenadas por apellidos y nombre, esta consulta tiene que valor para cualquier momento.
-
+SELECT nombre || ' ' || apellido AS "Persona"
+FROM persona 
+WHERE EXTRACT(YEAR FROM sysdate) - EXTRACT(YEAR FROM fecha_nacimiento) >= 25;
 
 --26. Nombres completos de los profesores que además son alumnos.
-
+SELECT p.nombre || ' ' || p.apellido AS "Nombre de profesor/alumno" 
+FROM persona p, profesor p2, alumno a 
+WHERE p.dni = a.dni 
+AND p2.dni = p.dni;
 
 --27. Suma de los créditos de las asignaturas de la titulación de Matemáticas.
+SELECT SUM(a.creditos)
+FROM asignatura a, titulacion t
+WHERE a.idtitulacion = t.idtitulacion 
+AND UPPER(t.nombre) LIKE 'MATEMATICAS';
 
-
---28. Número de asignaturas de la titulación de Matemáticas.       --ESTÁ MAL
-SELECT COUNT(asignatura.idasignatura), titulacion.nombre FROM asignatura, titulacion WHERE titulacion.idtitulacion = asignatura.idtitulacion AND titulacion.nombre LIKE 'Matematicas';
+--28. Número de asignaturas de la titulación de Matemáticas.       
+SELECT COUNT(a.idasignatura) 
+FROM asignatura a, titulacion t 
+WHERE a.idtitulacion = t.idtitulacion 
+AND UPPER(t.nombre) LIKE 'MATEMATICAS';
 
 --29. ¿Cuánto paga cada alumno por su matrícula?
+SELECT aa.idalumno, 
+	   SUM((a.costebasico * (1.00 + (10 * aa.numeromatricula)))) AS "Precio de matricula"
+FROM alumno_asignatura aa, asignatura a
+WHERE aa.idasignatura = a.idasignatura
+GROUP BY aa.idalumno;
 
 --30. ¿Cuántos alumnos hay matriculados en cada asignatura?
-
-
-
---No sé hacer el resto. 
+SELECT a.nombre, COUNT(aa.idalumno)
+FROM alumno_asignatura aa, asignatura a
+WHERE aa.idasignatura = a.idasignatura
+GROUP BY a.nombre;
 
 
 

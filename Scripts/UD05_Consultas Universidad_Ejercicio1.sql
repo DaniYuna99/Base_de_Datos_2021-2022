@@ -15,7 +15,7 @@ drop table titulacion cascade constraint;
 */
 
 -------------------
---CREACIÃ“N TABLAS--
+--CREACION TABLAS--
 -------------------
 /*
 Create table titulacion (
@@ -127,104 +127,175 @@ insert into alumno_asignatura values('A131313','160002','4');
 --EJERCICIOS--
     
 /*1. Mostrar los nombres y los creditos de cada una de las asignaturas.*/
-SELECT nombre, creditos FROM asignatura;
+SELECT nombre, creditos 
+FROM asignatura;
 
 /*2. Obtener los posibles distintos creditos de las asignaturas que hay en la base de datos.*/
-SELECT creditos FROM asignatura;
+SELECT DISTINCT creditos 
+FROM asignatura;
 
 /*3. Mostrar todos los datos de todas de las personas.*/
-SELECT * FROM persona;
+SELECT * 
+FROM persona;
 
 /*4. Mostrar el nombre y creditos de las asignaturas del primer cuatrimestre.*/
-SELECT nombre, creditos FROM asignatura WHERE cuatrimestre = 1;
+SELECT nombre, creditos 
+FROM asignatura 
+WHERE cuatrimestre = 1;
 
 /*5. Mostrar el nombre y el apellido de las personas nacidas antes del 1 de enero de 1975.*/
-SELECT nombre, apellido FROM persona WHERE fecha_nacimiento < TO_DATE('1975-01-01', 'YYYY/MM/DD');
-SELECT nombre, apellido FROM persona WHERE EXTRACT(YEAR FROM fecha_nacimiento) < 1975;
+SELECT nombre, apellido 
+FROM persona 
+WHERE fecha_nacimiento < TO_DATE('1975-01-01', 'YYYY/MM/DD');
+
+SELECT nombre, apellido 
+FROM persona 
+WHERE EXTRACT(YEAR FROM fecha_nacimiento) < 1975;
 
 /*6. Mostrar el nombre y el coste basico de las asignaturas de mas de 4,5 creditos.*/
-SELECT nombre, costebasico FROM asignatura WHERE creditos NOT IN (4, 5);
+SELECT nombre, costebasico 
+FROM asignatura 
+WHERE creditos NOT IN (4, 5);
 
 /*7. Mostrar el nombre de las asignaturas cuyo coste basico esta entre 25 y 35 euros.*/
-SELECT nombre FROM asignatura WHERE costebasico IN (25, 35);
+SELECT nombre 
+FROM asignatura 
+WHERE costebasico IN (25, 35);
 
 /*8. Mostrar el identificador de los alumnos matriculados en la asignatura '150212' o en la '130113' o en ambas.*/
-SELECT idalumno FROM alumno_asignatura WHERE idasignatura = 150212 OR idasignatura = 130113;
+SELECT idalumno 
+FROM alumno_asignatura 
+WHERE idasignatura = 150212 
+OR idasignatura = 130113;
 
 /*9. Obtener el nombre de las asignaturas del segundo cuatrimestre que no sean de 6 creditos.*/
-SELECT nombre FROM asignatura WHERE cuatrimestre = 2 AND creditos NOT IN 6;
+SELECT nombre 
+FROM asignatura 
+WHERE cuatrimestre = 2 
+AND creditos NOT IN 6;
 
 /*10. Mostrar el nombre y el apellido de las personas cuyo apellido comience por 'G'.*/
-SELECT nombre, apellido FROM persona WHERE apellido LIKE 'G%';
+SELECT nombre, apellido 
+FROM persona
+WHERE apellido LIKE 'G%';
 
 /*11. Obtener el nombre de las asignaturas que no tienen dato para el IdTitulacion.*/ 
-SELECT nombre FROM asignatura WHERE idtitulacion IS NULL;
+SELECT nombre 
+FROM asignatura 
+WHERE idtitulacion IS NULL;
 
 /*12. Obtener el nombre de las asignaturas que tienen dato para el IdTitulacion.*/
-SELECT nombre FROM asignatura WHERE idtitulacion IS NOT NULL;
+SELECT nombre 
+FROM asignatura 
+WHERE idtitulacion IS NOT NULL;
 
-/*13. Mostrar el nombre de las asignaturas cuyo coste por cada crédito sea mayor de 8 euros.*/ 
-SELECT nombre FROM asignatura WHERE creditos > 8;
+/*13. Mostrar el nombre de las asignaturas cuyo coste por cada credito sea mayor de 8 euros.*/ 
+SELECT nombre 
+FROM asignatura 
+WHERE creditos > 8;
 
-/*14. Mostrar el nombre y el número de horas de las asignaturas de la 
+/*14. Mostrar el nombre y el numero de horas de las asignaturas de la 
  * base de datos. (1cred.= 10 horas).*/
-SELECT nombre, creditos FROM asignatura;
+SELECT nombre, (creditos * 10) AS "Horas asignatura"
+FROM asignatura;
 
 /*15. Mostrar todos los datos de las asignaturas del segundo cuatrimestre 
  * ordenados por el identificador de asignatura.*/
-SELECT * FROM asignatura ORDER BY idasignatura ASC;
+SELECT * 
+FROM asignatura
+WHERE cuatrimestre = 2
+ORDER BY idasignatura ASC;
 
 /*16. Mostrar el nombre de todas las mujeres que viven en 'Madrid'.*/
-SELECT nombre FROM persona WHERE varon = 0 AND ciudad LIKE 'Madrid';
+SELECT nombre
+FROM persona 
+WHERE varon = 0 
+AND ciudad LIKE 'Madrid';
 
 /*17. Mostrar el nombre y los telefonos de aquellas 
  * personas cuyo telefono empieza por 91.*/
-SELECT nombre, telefono FROM persona WHERE telefono BETWEEN 910000000 AND 920000000;
+SELECT nombre, telefono 
+FROM persona 
+WHERE telefono BETWEEN 910000000 AND 920000000;
+
+SELECT nombre, telefono 
+FROM persona 
+WHERE telefono LIKE '91%';
 
 /*18. Mostrar el nombre de las asignaturas que contengan la silaba 'pro'.*/
-SELECT nombre FROM asignatura WHERE nombre LIKE '%pro%';
+SELECT nombre 
+FROM asignatura 
+WHERE nombre LIKE '%pro%';
 
 /*19. Mostrar el nombre de la asignatura de primero y que 
  * lo imparta el profesor que tiene codigo P101*/
-SELECT nombre FROM asignatura WHERE curso = 1 AND idprofesor LIKE 'P101';
+SELECT nombre 
+FROM asignatura 
+WHERE curso = 1 
+AND idprofesor LIKE 'P101';
 
 /*20. Mostrar el codigo de alumno que se ha matriculado 
  * tres o mas veces de una asignatura, mostrando tambien el 
  * codigo de la asignatura correspondiente.*/
-SELECT idalumno FROM alumno_asignatura WHERE numeromatricula >= 3;
+SELECT idalumno 
+FROM alumno_asignatura 
+WHERE numeromatricula >= 3;
 
 /*21. El coste de cada asignatura va subiendo a medida que se repite la asignatura. Para saber cual seria el precio de las distintas 
  asignaturas en las repeticiones (y asi animar a nuestros alumnos a que estudien) se quiere mostrar un listado en donde esta el 
  nombre de la asignatura, el precio basico, el precio de la primera repeticion (un 10 por ciento mas que el coste basico), 
  el precio de la segunda repeticion (un 30 por ciento mas que el coste basico) y el precio de la tercer repeticion 
  (un 60 por ciento mas que el coste basico).*/
-
+SELECT a.nombre AS "Nombre de asignatura", 
+	   a.costebasico AS "Precio basico", 
+	   (a.costebasico * 1.10) AS "Primera repeticion",
+	   (a.costebasico * 1.30) AS "Segunda repeticion",
+	   (a.costebasico * 1.60) AS "Tercera repeticion"
+FROM asignatura a;
 
 /*22. Mostrar todos los datos de las personas que tenemos en la base de datos que han nacido antes de la decada de los 70.*/
-SELECT * FROM persona WHERE fecha_nacimiento < TO_DATE('1970-01-01', 'YYYY-MM-DD');
+SELECT * FROM persona 
+WHERE fecha_nacimiento < TO_DATE('1970-01-01', 'YYYY-MM-DD');
 
 /*23. Mostrar el identificador de las personas que trabajan como profesor, sin que salgan valores repetidos.*/
-SELECT idprofesor FROM profesor;
+SELECT DISTINCT idprofesor 
+FROM profesor;
 
 /*24. Mostrar el identificador de los alumnos que se encuentran matriculados en la asignatura con codigo 130122.*/
-SELECT idalumno FROM alumno_asignatura WHERE idasignatura = 130122;
+SELECT idalumno 
+FROM alumno_asignatura 
+WHERE idasignatura = 130122;
 
 /*25. Mostrar los codigos de las asignaturas en las que se encuentra matriculado algun alumno, sin que salgan codigos repetidos.*/
-
+SELECT DISTINCT a.idasignatura 
+FROM asignatura a, alumno_asignatura aa 
+WHERE a.idasignatura = aa.idasignatura;
 
 /*26. Mostrar el nombre de las asignaturas que tienen mas de 4 creditos, y ademas, 
  * o se imparten en el primer cuatrimestre o son del primer curso.*/
-
+SELECT nombre 
+FROM asignatura 
+WHERE creditos > 4 
+AND (cuatrimestre = 1
+OR curso = 1);
 
 /*27. Mostrar los distintos codigos de las titulaciones en las que hay alguna asignatura en nuestra base de datos.*/
-
+SELECT DISTINCT t.idtitulacion 
+FROM titulacion t, asignatura a
+WHERE t.idtitulacion = a.idtitulacion;
 
 /*28. Mostrar el dni de las personas cuyo apellido contiene la letra G en mayusculas o minusculas.*/
-
+SELECT dni 
+FROM persona 
+WHERE UPPER(apellido) LIKE 'G%'; 
 
 /*29. Mostrar las personas varones que tenemos en la base de datos que han nacido con posterioridad 
  * a 1970 y que vivan en una ciudad que empieza por M.*/
-
+SELECT *
+FROM persona 
+WHERE varon = 1 
+AND fecha_nacimiento > TO_DATE('01/01/1970', 'DD/MM/YYYY')
+AND UPPER(ciudad) LIKE 'M%';
 
 
 
