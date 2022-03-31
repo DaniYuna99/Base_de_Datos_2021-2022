@@ -1453,29 +1453,109 @@ AND f.codfac IS NULL;
 		
 /*7. Obtener el numero de clientes que en todas las facturas del 
 anio pasado han pagado IVA (no se ha pagado IVA si es cero o nulo).*/
-		
+SELECT COUNT(c.codcli)
+FROM clientes c 
+WHERE c.codcli NOT IN (SELECT f.codcli 
+					   FROM facturas f 
+					   WHERE EXTRACT(YEAR FROM f.fecha) = EXTRACT(YEAR FROM sysdate) - 1 
+					   AND (f.iva = 0
+					   OR f.iva IS NULL));
+
 /*8. Clientes (codigo y nombre) que fueron preferentes durante el 
 mes de noviembre del anio pasado y que en diciembre de ese mismo 
 anio no tienen ninguna factura. Son clientes preferentes de un 
-mes aquellos que han solicitado mas de 60,50 euros en facturas 
+mes aquellos que han solicitado mas de 60.50 euros en facturas 
 durante ese mes, sin tener en cuenta descuentos ni impuestos.*/
-		
+SELECT c.codcli, c.nombre
+FROM clientes c, facturas f 
+WHERE c.codcli = f.codcli
+AND EXTRACT(YEAR FROM f.fecha) = EXTRACT (YEAR FROM sysdate) - 1 
+AND EXTRACT (MONTH FROM f.fecha) IN (11, 12) 
+AND f.codfac IN (SELECT lf.codfac 
+				 FROM lineas_fac lf 
+				 WHERE lf.cant * TO_NUMBER(lf.precio) > 60.5);
+					  
 /*9. Codigo, descripcion y precio de los diez articulos mas caros.*/
-		
+SELECT * 
+FROM (SELECT a.codart, a.descrip, a.precio
+	  FROM articulos a 
+	  ORDER BY a.precio DESC) aa
+WHERE ROWNUM <= 10;
+				
 /*10. Nombre de la provincia con mayor numero de clientes.*/
-		
+SELECT p.nombre
+FROM (SELECT p2.nombre, MAX(COUNT(c.codcli)) 
+	  FROM clientes c, provincias p2, pueblos pu 
+	  WHERE p2.codpro = pu.codpro 
+	  AND pu.codpue = c.codpue 
+	  GROUP BY p2.nombre);
+WHERE ROWNUM = 1;			--Le falta, creo.
+
 /*11. Codigo y descripcion de los articulos cuyo precio es mayor
 de 90.15 euros y se han vendido menos de 10 unidades (o ninguna)
 durante el anio pasado.*/
-		
+SELECT ARTICULOS.codart, ARTICULOS.descrip
+FROM ARTICULOS, LINEAS_FAC, FACTURAS
+WHERE ARTICULOS.codart = LINEAS_FAC.codart AND LINEAS_FAC.CODFAC = FACTURAS.CODFAC
+AND ARTICULOS.PRECIO > 90.15
+AND extract(YEAR FROM FECHA) = (extract(YEAR FROM sysdate)-1)
+AND ARTICULOS.codart IN(SELECT codart
+						FROM LINEAS_FAC
+						GROUP BY codart
+						HAVING SUM(nvl(CANT,0)) < 10);
+
 /*12. Codigo y descripcion de los articulos cuyo precio es mas 
 de tres mil veces mayor que el precio minimo de cualquier articulo.*/
-		
+SELECT codart, precio 
+FROM articulos 
+WHERE precio > (SELECT MIN(precio) * 3000 
+				FROM articulos);
+				
 /*13. Nombre del cliente con mayor facturacion.*/
+SELECT B.NOMBRE
+FROM (SELECT c.NOMBRE, MAX(fc.PRECIO*fc.CANT)
+	  FROM CLIENTES c, FACTURAS f, LINEAS_FAC fc
+	  WHERE c.CODCLI = f.CODCLI 
+	  AND f.CODFAC = fc.CODFAC 
+	  GROUP BY c.NOMBRE
+	  ORDER BY MAX(fc.PRECIO*fc.CANT) DESC) B
+WHERE ROWNUM =1;
 		
 /*14. Codigo y descripcion de aquellos articulos con un precio superior
 a la media y que hayan sido comprados por mas de 5 clientes.*/		
-		
+SELECT distinct ARTICULOS.codart, ARTICULOS.descrip
+FROM ARTICULOS, LINEAS_FAC
+WHERE ARTICULOS.codart = LINEAS_FAC.codart
+AND LINEAS_FAC.codart IN (SELECT LINEAS_FAC.codart 
+						  FROM LINEAS_FAC, FACTURAS
+						  WHERE LINEAS_FAC.CODFAC = FACTURAS.CODFAC
+						  GROUP BY LINEAS_FAC.codart
+						  HAVING COUNT(distinct FACTURAS.CODCLI) > 5)
+						  AND ARTICULOS.PRECIO > (SELECT avg(PRECIO)
+						    					  FROM ARTICULOS);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		
 		
 	

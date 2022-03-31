@@ -1,15 +1,15 @@
 		/*****************************************************/
 		/*                                                   */
-		/*    		EJERCICIO PECES (Boletin 1)              */
+		/*    	  EJERCICIO PECES (Boletin 1, 2, 3)          */
 		/*                                                   */
 		/*****************************************************/
 
 --########################################################################
-				-- CREACION DE USUARIO (peces_boletin1)
+				-- CREACION DE USUARIO (peces_boletin2)
 			/*
 			alter session set "_oracle_script"=true;  
-			create user peces_boletin1 identified by peces_boletin1;
-			GRANT CONNECT, RESOURCE, DBA TO peces_boletin1;
+			create user peces_boletin2 identified by peces_boletin2;
+			GRANT CONNECT, RESOURCE, DBA TO peces_boletin2;
 			*/
 
 --########################################################################
@@ -4083,7 +4083,7 @@ ALTER TABLE CapturasEventos
     CHECK (talla > 0);
 */
 		
---########################################################################
+--#####################################################################################
 		
 		
 		/*****************************************************/
@@ -4091,18 +4091,24 @@ ALTER TABLE CapturasEventos
 		/*       AQUI EMPIEZAN LOS EJERCICIOS COMO TAL       */
 		/*                                                   */
 		/*****************************************************/
+
+--======================================================================================
+
+								/* BOLETIN 1 */
+
+--======================================================================================
 		
 /*Escribe en un fichero de texto las sentencias que responden a las siguientes preguntas identificando el 
 número de respuesta. Debes realizar al menos un JOIN y una unión de tablas con WHERE.*/
 
-/*1. Nombre, apellido y teléfono de todos los afiliados que sean hombres y que hayan nacido antes 
+/*1.1. Nombre, apellido y teléfono de todos los afiliados que sean hombres y que hayan nacido antes 
 del 1 de enero de 1970.*/
 SELECT nombre, apellidos, telf 
 FROM afiliados 
 WHERE UPPER(sexo) LIKE 'H'
 AND nacimiento < TO_DATE('01/01/1970', 'DD/MM/YYYY');
 
-/*2. Peso, talla  y nombre de todos los peces que se han pescado por con talla inferior o igual a 45. 
+/*1.2. Peso, talla  y nombre de todos los peces que se han pescado por con talla inferior o igual a 45. 
 Los datos deben salir ordenados por el nombre del pez, y para el mismo pez por el peso 
 (primero los más grandes) y para el mismo peso por la talla (primero los más grandes).*/
 SELECT cs.peso, cs.talla, cs.pez, ce.peso, ce.peso, ce.pez 
@@ -4111,7 +4117,7 @@ WHERE cs.pez = p.pez
 AND ce.pez = p.pez
 ORDER BY cs.pez, ce.pez, cs.peso DESC, ce.peso DESC, cs.talla DESC, ce.talla DESC;
 
-/*3. Obtener los nombres y apellidos de los afiliados que o bien tienen la licencia de pesca que 
+/*1.3. Obtener los nombres y apellidos de los afiliados que o bien tienen la licencia de pesca que 
 comienzan con una A (mayúscula o minúscula), o bien el teléfono empieza en 9 y la dirección comienza en Avda.*/
 SELECT DISTINCT a.nombre, a.apellidos 
 FROM afiliados a, permisos p 
@@ -4119,20 +4125,20 @@ WHERE a.ficha = p.ficha
 AND (UPPER(p.licencia) LIKE 'A%'
 OR (a.telf LIKE '9%' AND UPPER(a.direccion) LIKE 'AVDA%'));
 
-/*4. Lugares del cauce “Rio Genil” que en el campo de observaciones no tengan valor.*/
+/*1.4. Lugares del cauce “Rio Genil” que en el campo de observaciones no tengan valor.*/
 SELECT l.lugar 
 FROM lugares l, cauces c 
 WHERE l.cauce = c.cauce
 AND c.observaciones IS NULL;
 
-/*5. Mostrar el nombre y apellidos de cada afiliado, junto con la ficha de los afiliados que lo han 
+/*1.5. Mostrar el nombre y apellidos de cada afiliado, junto con la ficha de los afiliados que lo han 
 avalado alguna vez como primer avalador.*/
 SELECT DISTINCT a.nombre, a.apellidos, p.ficha 
 FROM afiliados a, participaciones p, capturassolos cs 
 WHERE a.ficha = p.ficha 
 AND a.ficha = cs.aval1;
 
-/*6. Obtén los cauces y en qué lugar de ellos han encontrado tencas (tipo de pez) cuando nuestros 
+/*1.6. Obtén los cauces y en qué lugar de ellos han encontrado tencas (tipo de pez) cuando nuestros 
 afiliados han ido a pescar solos, indicando la comunidad a la que pertenece dicho lugar. 
 (no deben salir valores repetidos)*/
 SELECT DISTINCT l.comunidad, c.cauce 
@@ -4142,7 +4148,7 @@ AND cs.lugar = l.lugar
 AND a.ficha = cs.ficha
 AND UPPER(cs.pez) LIKE 'TENCA';
 
-/*7. Mostrar el nombre y apellido de los afiliados que han conseguido alguna copa. Los datos deben 
+/*1.7. Mostrar el nombre y apellido de los afiliados que han conseguido alguna copa. Los datos deben 
 salir ordenados por la fecha del evento, mostrando primero los eventos más antiguos.*/
 SELECT a.nombre, a.apellidos, p.evento, e.fecha_evento 
 FROM afiliados a, participaciones p, eventos e 
@@ -4151,7 +4157,7 @@ AND p.evento = e.evento
 AND p.trofeo IS NOT NULL
 ORDER BY e.fecha_evento ASC;
 
-/*8. Obtén la ficha, nombre, apellidos, posición y trofeo de todos los participantes del evento 
+/*1.8. Obtén la ficha, nombre, apellidos, posición y trofeo de todos los participantes del evento 
 'Super Barbo' mostrándolos según su clasificación.*/
 SELECT a.ficha, a.nombre, a.apellidos, p.posicion, p.trofeo, ce.puntos 
 FROM afiliados a, participaciones p, capturaseventos ce
@@ -4160,14 +4166,14 @@ AND a.ficha = ce.ficha
 AND UPPER(p.evento) LIKE 'SUPER BARBO'
 ORDER BY ce.puntos DESC;
 
-/*9. Mostrar el nombre y apellidos de cada afiliado, junto con el nombre y apellidos de los 
+/*1.9. Mostrar el nombre y apellidos de cada afiliado, junto con el nombre y apellidos de los 
 afiliados que lo han avalado alguna vez como segundo avalador.*/
 SELECT DISTINCT a.nombre, a.apellidos, a2.nombre, a2.apellidos 
 FROM afiliados a, afiliados a2, capturassolos cs 
 WHERE a.ficha = cs.ficha 
 AND a2.ficha = cs.aval2;
 
-/*10. Indica todos los eventos en los que participó el afiliado 3796 en 1995 que no 
+/*1.10. Indica todos los eventos en los que participó el afiliado 3796 en 1995 que no 
 consiguió trofeo, ordenados descendentemente por fecha.*/
 SELECT p.evento 
 FROM participaciones p, eventos e 
@@ -4176,17 +4182,255 @@ WHERE p.ficha = (SELECT ficha
 				WHERE ficha = 3796)
 AND EXTRACT(YEAR FROM e.fecha_evento) = 1995
 AND p.trofeo IS NULL
-ORDER BY e.fecha_evento DESC;
-		
+ORDER BY e.fecha_evento DESC;		
 
+
+
+--======================================================================================
+
+								/* BOLETIN 2 */
+
+--======================================================================================
+
+/*Escribe en un fichero de texto las sentencias que responden a las siguientes preguntas 
+identificando el número de respuesta.*/
+
+/*2.1. Mostrar el nombre y apellidos de todos los afiliados que tengan una licencia que 
+empieza por A.*/
+SELECT nombre, apellidos 
+FROM afiliados
+WHERE ficha IN (SELECT ficha 
+				FROM permisos 
+				WHERE licencia LIKE 'A%');
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+/*2.2. Mostrar los nombres de los peces que se han capturado en los eventos celebrados 
+durante el año de 1998 indicando el nombre de la comunidad en la que se celebraron 
+junto con el nombre y apellido del afiliado que lo capturó. La información debe 
+aparecer ordenada por comunidad, luego por peces y por último por apellido del afiliado.*/
+SELECT a.nombre || ' ' || a.apellidos AS "Afiliado", ce.pez, l.comunidad 
+FROM afiliados a, capturaseventos ce, eventos e, lugares l
+WHERE a.ficha = ce.ficha 
+AND ce.evento = e.evento
+AND e.lugar = l.lugar 
+AND EXTRACT(YEAR FROM e.fecha_evento) = 1998 
+ORDER BY l.comunidad, ce.pez, a.apellidos;
+			
+/*2.3. Mostrar los eventos, el lugar y los cauces en los que se han celebrado eventos 
+internacionales (el nombre del evento contiene la palabra internacional en mayúsculas 
+o minúsculas). Hay que hacer esta sentencia con JOIN.*/
+SELECT e.evento, l.lugar, c.cauce 
+FROM eventos e JOIN lugares l 
+ON e.lugar = l.lugar
+JOIN cauces c 
+ON l.cauce = c.cauce
+AND UPPER(e.evento) LIKE '%INTERNACIONAL%';
+
+/*2.4. Para cada uno de los peces que ha sido pescado por un afiliado en solitario, 
+mostrar el nombre del pez, la talla, la fecha de pesca y la hora de la pesca, 
+mostrando los datos ordenados por peces y luego los más grandes.*/
+SELECT pez, talla, fecha_pesca, hora_pesca, ficha
+FROM capturassolos
+WHERE ficha IN (SELECT ficha 
+				FROM afiliados)
+ORDER BY pez, talla DESC;
+
+/*2.5. Mostrar todos los cauces en los que alguna vez algún afiliado ha pescado alguna 
+vez un pez en solitario, siempre que la relación talla/peso sea mayor que 3.*/
+SELECT DISTINCT c.cauce 
+FROM cauces c, lugares l, capturassolos cs, afiliados a 
+WHERE a.ficha = cs.ficha 
+AND cs.lugar = l.lugar 
+AND l.cauce = c.cauce 
+AND (cs.talla / cs.peso) >= 3;
+
+/*2.6. Mostrar el nombre y el apellido de los afiliados que han pescado algún pez en 
+un evento y que en el campo de observaciones esté recogido que su hábitat es ríos.*/
+SELECT DISTINCT a.nombre || ' ' || a.apellidos AS "Afiliado" 
+FROM afiliados a, capturaseventos ce, eventos e, lugares l 
+WHERE a.ficha = ce.ficha(+) 
+AND ce.ficha IS NOT NULL
+AND ce.evento = e.evento
+AND e.lugar = l.lugar
+AND UPPER(l.observaciones) LIKE '%RIO%';			
+
+/*2.7. Mostrar el nombre y el apellido del afiliado o afiliados que ha sido el primer 
+avalador del afiliado con código 1000.*/
+SELECT a.nombre || ' ' || a.apellidos AS "Afiliado"  
+FROM afiliados a, capturassolos cs 
+WHERE a.ficha = cs.aval1 
+AND cs.ficha = 1000;
+
+/*2.8. Mostrar los eventos que se han celebrado en un lugar en el que el campo de 
+observaciones no tiene valor.*/
+SELECT e.evento 
+FROM eventos e, lugares l 
+WHERE e.lugar = l.lugar 
+AND l.observaciones IS NULL;
+
+/*2.9. Muestra el nombre y apellidos de todos las parejas de avales que existen 
+en la base de datos. Es decir, debes mostrar el nombre y apellido del primer 
+aval y el nombre y apellido del segundo aval.*/
+SELECT a.nombre || ' ' || a.apellidos AS "Avalista 1", a2.nombre || ' ' || a2.apellidos AS "Avalista 2" 
+FROM afiliados a, afiliados a2, capturassolos cs 
+WHERE a.ficha = cs.aval1 
+AND a2.ficha = cs.aval2;
+
+/*2.10. Mostrar el nombre y apellido del afiliado o afiliados que han quedado en 
+algunas de las cuatro primeras posiciones en algún evento o que participado 
+en algún evento celebrado en el Coto De Dilar  o en el Coto De Fardes. 
+(hay que hacer esta consulta sin utilizar JOIN)*/
+SELECT nombre || ' ' || apellidos AS "Afiliado"
+FROM afiliados 
+WHERE ficha IN (SELECT ficha 
+				FROM participaciones 
+				WHERE evento IN (SELECT evento 
+								 FROM eventos 
+								 WHERE UPPER(lugar) LIKE 'COTO DE DILAR'
+								 OR UPPER(lugar) LIKE 'COTO DE FARDES')
+				AND posicion <= 4);
+
+
+--======================================================================================
+
+				  /* SIMULACROS 1 - CONSULTAS SIMPLES AGREGADOS */
+
+--======================================================================================
+
+/*3.1. Nombre y teléfono de todos los afiliados que sean hombres.*/
+SELECT nombre, telf 
+FROM afiliados 
+WHERE sexo LIKE 'H';
+			
+/*3.2. Peso y talla de todos los peces que se han pescado por libre antes de las 10:00 
+de la mañana, con talla inferior o igual a 45.*/
+SELECT peso, talla 
+FROM capturassolos
+WHERE hora_pesca < TO_DATE('10:00', 'HH24:MI')
+AND talla <= 45;
+
+/*3.3. Nombre de los eventos celebrados durante el mes de marzo.*/
+SELECT evento 
+FROM eventos 
+WHERE EXTRACT(MONTH FROM fecha_evento) = 03;
+
+/*3.4. Lugares del cauce “Rio Genil” que no contengan la palabra “muerte” en 
+mayúsculas o minúsculas.*/
+SELECT l.lugar 
+FROM lugares l, cauces c
+WHERE l.cauce = c.cauce
+AND UPPER(l.observaciones) NOT LIKE '%MUERTE%';
+
+/*3.5. Obtener los nombres y apellidos de los afiliados que tienen la licencia 
+de pesca que comienzan con una A o con una D.*/
+SELECT DISTINCT a.nombre || ' ' || a.apellidos AS "Afiliado"
+FROM afiliados a, permisos p 
+WHERE p.ficha = a.ficha 
+AND p.licencia LIKE 'A%'
+OR p.licencia LIKE 'D%';
+
+/*3.6. Obtén un listado de todos los concursos en los que no se pesca la especie 
+'Black-Bass' y que la talla mínima del pez sea mayor que 15. El listado 
+estará ordenado por nombre de evento y nombre de pez.*/
+SELECT e.*, ce.pez 
+FROM eventos e, capturaseventos ce
+WHERE e.evento = ce.evento 
+AND ce.pez NOT LIKE 'Black-Bass'
+AND ce.talla >= 15
+ORDER BY e.evento, ce.pez;
+
+/*3.7. Obtén los cauces y en qué lugar de ellos se pueden encontrar tencas 
+(tipo de pez), indicando la comunidad a la que pertenece dicho lugar.*/
+SELECT DISTINCT c.cauce, l.lugar, l.comunidad
+FROM cauces c, lugares l, capturassolos cs 
+WHERE c.cauce = l.cauce 
+AND l.lugar = cs.lugar 
+AND UPPER(cs.pez) LIKE 'TENCA';
+
+/*3.8. Obtén los cauces y en qué lugar de ellos se pueden encontrar tencas 
+(tipo de pez), indicando la comunidad a la que pertenece dicho lugar.*/
+	/*MISMO EJERCICIO QUE ARRIBA.*/
+
+/*3.9. Obtén la ficha, nombre, apellidos, posición y trofeo de todos los 
+participantes del evento 'Super Barbo' clasificados entre los tres primeros.*/
+SELECT a.ficha, a.nombre || ' ' || a.apellidos AS "Afiliado", p.posicion, p.trofeo
+FROM afiliados a, participaciones p 
+WHERE a.ficha = p.ficha 
+AND UPPER(p.evento) LIKE 'SUPER BARBO'
+AND p.posicion <= 3;
+
+/*3.10. Indica todos los eventos en los que participó el afiliado 3796 en 1995 
+que no consiguió trofeo, ordenados descendentemente por fecha.*/
+			
+/*3.11. Mostrar el número de peces distintos que se han capturado fuera de concurso.*/
+			
+/*3.12. Mostrar el nombre de los cauces que tengan más de un lugar.*/
+			
+/*3.13. Mostrar los peces capturados en concursos que superen la media de peso.*/
+			
+/*3.14. Obtener el número de capturas totales que se ha realizado en cada 
+comunidad dentro de las competiciones. Debe aparecer la comunidad y el 
+número de capturas ordenados por orden alfabético.*/
+			
+/*3.15. Obtener el nombre de los afiliados que hayan pescado algún pez en más 
+de dos lugares distintos en un evento.*/
+			
+/*3.16. Obtener el nombre de los afiliados que hayan pescado más de dos tipos 
+distintos de pez fuera de concurso.*/
+			
+	
+			
+--======================================================================================
+
+				  		/* SIMULACROS 2 - SUBCONSULTAS */
+
+--======================================================================================		
+			
+/*4.1. Mostrar el nombre de los peces que únicamente se hayan capturado por libre.*/
+
+/*4.2. A la siguiente consulta la llamaremos el pez madrugador, debes mostrar el 
+pez que ha sido capturado más temprano por libre.*/
+
+/*4.3. Obtén la mejor posición alcanzada en competición a lo largo de su vida por 
+el afiliado 1002. Debe aparecer, además de la posición, el evento en que la 
+alcanzó y el trofeo obtenido.*/
+
+/*4.4. Obtén el nombre y apellidos de todas las personas que en alguno de los 
+eventos '1er Encuentro Lures and Pikes' hayan realizado capturas de un 
+peso superior a la media que se registró en dicho evento.*/
+
+/*4.5. Obtén todas las personas que han realizado una captura en solitario 
+pero que nunca han avalado la captura de otro.*/
+
+/*4.6. Confirma si alguien ha capturado más de 5 peces en el evento 'Super Barbo', 
+mostrando el número de ficha, el pez capturado y la cantidad de capturas. 
+Si nadie ha infringido las normas, el resultado de la consulta es 'ninguna fila'.*/
+
+/*4.7. Elimina las capturas de los aquellos usuarios que se hayan avalado a sí mismos.*/
+
+/*4.8. Actualiza el peso de la trucha con mayor peso de capturasolos al peso de la trucha 
+más pesada en el evento 'La Gran Trucha'.*/
+
+/*4.9. Se ha detectado un error en la báscula de 0.5 kg en el evento “Super Carpa”, 
+por lo que hay que actualizar el peso (sumando 0.5 kg) a todas las capturas de 
+dicho evento.*/  
+
+/*4.10. Se desea modificar la tabla participaciones añadiendo un campo premio, a 
+continuación deberás dejar en el campo trofeo solo copa y en el campo premio 
+el importe del premio.*/
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+
+
